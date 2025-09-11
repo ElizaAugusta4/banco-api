@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+              - name: MYSQL_ROOT_PASSWORD
+                value: examplepassword
+              - name: MYSQL_DATABASE
+                value: accounts_db
+              - name: MYSQL_DATABASE_TRANSACTIONS
+                value: transactions_db
+              - name: MYSQL_DATABASE_BALANCE
+                value: balance_db
+          ports:
+            - containerPort: 3306
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              docker-entrypoint.sh mysqld &
+              sleep 10
+              mysql -uroot -pexamplepassword -e "CREATE DATABASE IF NOT EXISTS accounts_db; CREATE DATABASE IF NOT EXISTS transactions_db; CREATE DATABASE IF NOT EXISTS balance_db;"
+              wait
+      volumes:
+        - name: mysql-persistent-storage
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
