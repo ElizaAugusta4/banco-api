@@ -1,4 +1,4 @@
-name: CD to Kubernetes Cluster
+name: CI-CD pipeline
 
 on:
   push:
@@ -7,6 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy build step
+        run: echo "Build and push step (ajuste conforme necessário)"
+
   deploy-k8s:
     runs-on: ubuntu-latest
     needs: build-and-push
