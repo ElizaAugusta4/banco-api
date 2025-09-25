@@ -21,5 +21,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo yum install -y git
+            rm -rf banco-api
+            git clone https://github.com/ElizaAugusta4/banco-api.git
+            cd banco-api
             chmod +x ./deploy_k8s.sh
             ./deploy_k8s.sh
